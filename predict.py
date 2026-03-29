@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
 predict.py  —  reads JSON from stdin, runs pickle model, prints JSON to stdout.
-Model is downloaded from Google Drive if not present locally.
+Model is downloaded from Google Drive at startup (NOT during request).
 """
 
 import sys, json, pickle, os, numpy as np
-import gdown   # 👈 added
+import gdown
 
 FEATURE_COLS = [
     "setting1", "setting2",
@@ -19,7 +19,7 @@ BASE = os.path.dirname(__file__)
 MODEL_PATH  = os.path.join(BASE, "best_model.pkl")
 SCALER_PATH = os.path.join(BASE, "scaler.pkl")
 
-# 🔥 Your Google Drive model ID
+# 🔥 Google Drive model ID
 MODEL_ID = "1jNzIlMOyBe3OD8s2iJL6E0PeTZhlvUM6"
 
 def ensure_model():
@@ -27,6 +27,9 @@ def ensure_model():
         print("Downloading model from Google Drive...", file=sys.stderr)
         url = f"https://drive.google.com/uc?id={MODEL_ID}"
         gdown.download(url, MODEL_PATH, quiet=False)
+
+# ✅ IMPORTANT: Download model at startup (only once)
+ensure_model()
 
 def load(path):
     if not os.path.exists(path):
@@ -43,16 +46,12 @@ def status(rul):
 def main():
     data = json.loads(sys.stdin.read().strip())
 
-    # 🔥 Ensure model exists before loading
-    ensure_model()
-
     features = np.array([[float(data[c]) for c in FEATURE_COLS]])
 
     # Debug logs
     print(f"Input data keys: {list(data.keys())}", file=sys.stderr)
     print(f"Feature columns: {FEATURE_COLS}", file=sys.stderr)
     print(f"Features array shape: {features.shape}", file=sys.stderr)
-    print(f"First 5 features: {features[0][:5]}", file=sys.stderr)
 
     model = load(MODEL_PATH)
     if model is None:
@@ -65,7 +64,6 @@ def main():
         return
 
     print("Expected features:", model.n_features_in_, file=sys.stderr)
-    print("Raw features:", features, file=sys.stderr)
 
     scaler = load(SCALER_PATH)
     if scaler:
@@ -86,8 +84,7 @@ def main():
             "expected_features": int(model.n_features_in_),
             "features_sent": len(FEATURE_COLS),
             "raw_prediction": float(pred),
-            "scaled_rul": float(pred) * SCALE_FACTOR,
-            "feature_values": features[0].tolist()
+            "scaled_rul": float(pred) * SCALE_FACTOR
         }
     }
 
