@@ -1,0 +1,4 @@
+node_modules/
+best_model.pkl
+__pycache__/
+.env
