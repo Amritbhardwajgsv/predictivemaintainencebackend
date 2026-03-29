@@ -6,7 +6,7 @@ const path = require("path");
 const app = express();
 
 // Allow requests from the React frontend (Vite default port)
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors());
 app.use(express.json());
 
 // ─── POST /api/predict ───────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ const required = [
     return res.status(400).json({ error: `Missing fields: ${missing.join(", ")}` });
   }
 
-  const py = spawn("python", [path.join(__dirname, "predict.py")]);
+const py = spawn("python3", [path.join(__dirname, "predict.py")]);
 
   let stdout = "";
   let stderr = "";
