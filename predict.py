@@ -29,17 +29,18 @@ def ensure_model():
 
 # ✅ IMPORTANT: Download model at startup (only once)
 ensure_model()
-
 def load(path):
     if not os.path.exists(path):
         return None
 
-    import gzip
+    import zlib
     import pickle
 
-    with gzip.open(path, "rb") as f:
-        return pickle.load(f)
+    with open(path, "rb") as f:
+        compressed_data = f.read()
 
+    decompressed = zlib.decompress(compressed_data)
+    return pickle.loads(decompressed)
 def status(rul):
     if rul <= 15:  return "CRITICAL"
     if rul <= 40:  return "WARNING"
