@@ -4,7 +4,7 @@ predict.py  —  reads JSON from stdin, runs pickle model, prints JSON to stdout
 Model is downloaded from Google Drive at startup (NOT during request).
 """
 
-import sys, json, pickle, os, numpy as np
+import sys, json, os, numpy as np
 import gdown
 
 FEATURE_COLS = [
@@ -25,8 +25,7 @@ MODEL_ID = "1EqfFezOrAFG_CQWNR179lBsO0kGupB2v"
 def ensure_model():
     if not os.path.exists(MODEL_PATH):
         print("Downloading model from Google Drive...", file=sys.stderr)
-        url = f"https://drive.google.com/uc?id={MODEL_ID}"
-        gdown.download(url, MODEL_PATH, quiet=False)
+        gdown.download(id=MODEL_ID, output=MODEL_PATH)
 
 # ✅ IMPORTANT: Download model at startup (only once)
 ensure_model()
@@ -34,7 +33,11 @@ ensure_model()
 def load(path):
     if not os.path.exists(path):
         return None
-    with open(path, "rb") as f:
+
+    import gzip
+    import pickle
+
+    with gzip.open(path, "rb") as f:
         return pickle.load(f)
 
 def status(rul):
