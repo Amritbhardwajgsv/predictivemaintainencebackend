@@ -34,13 +34,16 @@ def load(path):
         return None
 
     import zlib
-    import pickle
+    import joblib
+    import io
 
     with open(path, "rb") as f:
         compressed_data = f.read()
 
     decompressed = zlib.decompress(compressed_data)
-    return pickle.loads(decompressed)
+
+    # load using joblib from memory
+    return joblib.load(io.BytesIO(decompressed))
 def status(rul):
     if rul <= 15:  return "CRITICAL"
     if rul <= 40:  return "WARNING"
