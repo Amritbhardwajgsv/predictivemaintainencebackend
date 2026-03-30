@@ -20,7 +20,7 @@ MODEL_PATH  = os.path.join(BASE, "best_model.pkl")
 SCALER_PATH = os.path.join(BASE, "scaler.pkl")
 
 # 🔥 Google Drive model ID
-MODEL_ID = "1jNzIlMOyBe3OD8s2iJL6E0PeTZhlvUM6"
+MODEL_ID = "1EqfFezOrAFG_CQWNR179lBsO0kGupB2v"
 
 def ensure_model():
     if not os.path.exists(MODEL_PATH):
